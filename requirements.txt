@@ -1,0 +1,14 @@
+# Core ML/NLP Libraries
+torch ==2.0.0
+transformers ==4.30.0
+vaderSentiment ==3.3.2
+nltk ==3.8.1
+# Data & Math
+pandas ==1.5.3
+numpy ==1.24.3
+scikit - learn ==1.2.2
+# Visualization
+matplotlib ==3.7.1
+seaborn ==0.12.2
+# Utilities
+joblib ==1.2.0
