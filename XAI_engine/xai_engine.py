@@ -11,7 +11,7 @@ OOP Concepts Used:
 """
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from feature_extractors import (
+from .feature_extractors import (
     extract_sentiment,
     extract_word_count,
     extract_adjective_noun_ratio,
@@ -21,8 +21,8 @@ from feature_extractors import (
     detect_excessive_punctuation,
     calculate_text_redundancy
 )
-from reason_generator import generate_explanation, format_explanation_text
-from config import THRESHOLDS
+from .reason_generator import generate_explanation, format_explanation_text
+from .config import THRESHOLDS
 
 # ============================================================================
 # CLASS DEFINITION
