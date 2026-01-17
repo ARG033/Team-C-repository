@@ -73,7 +73,6 @@ def generate_explanation(features, thresholds):
         confidence_score += 20
     
     # ===== TIER 2: IMPORTANT FEATURES =====
-    
     # 5. Spam Keywords Check
     if features['spam_keyword_count'] >= thresholds['SPAM_KEYWORD_MIN']:
         reasons.append({
@@ -82,7 +81,7 @@ def generate_explanation(features, thresholds):
             'detail': "High use of marketing language"
         })
         confidence_score += 15
-    
+        
     # 6. Excessive Caps Check
     if features['caps_ratio'] > thresholds['CAPS_RATIO_MAX']:
         reasons.append({
@@ -109,6 +108,36 @@ def generate_explanation(features, thresholds):
             'detail': "Repetitive language without substance"
         })
         confidence_score += 15
+    
+    # ===== TIER 3: ADVANCED FEATURES =====
+    
+    # 9. Readability Check (if available)
+    if 'flesch_score' in features:
+        if features['flesch_score'] > 90:  # Too easy, might be fake
+            reasons.append({
+                'feature': 'Readability',
+                'message': f" Extremely readable text (Flesch: {features['flesch_score']:.1f})",
+                'detail': "Overly simple language, common in generated reviews"
+            })
+            confidence_score += 10
+    
+    # 10. N-gram Check
+    if 'common_fake_ngrams' in features and features['common_fake_ngrams'] >= 2:
+        reasons.append({
+            'feature': 'N-gram Patterns',
+            'message': f" Contains {features['common_fake_ngrams']} common fake review phrases",
+            'detail': "Repetitive phrase patterns typical of spam"
+        })
+        confidence_score += 15
+    
+    # 11. Semantic Similarity Check
+    if 'tfidf_similarity' in features and features['tfidf_similarity'] > 0.5:
+        reasons.append({
+            'feature': 'Semantic Similarity',
+            'message': f" High similarity to generic reviews ({features['tfidf_similarity']:.2f})",
+            'detail': "Content resembles template or boilerplate text"
+        })
+        confidence_score += 20
     
     # ===== DETERMINE VERDICT =====
     

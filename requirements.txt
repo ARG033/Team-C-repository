@@ -3,6 +3,7 @@ torch==2.9.0
 transformers==4.30.0
 vaderSentiment==3.3.2
 nltk==3.8.1
+textstat==0.7.3  # For readability scores
 # Data & Math
 pandas==1.5.3
 numpy==1.26.4

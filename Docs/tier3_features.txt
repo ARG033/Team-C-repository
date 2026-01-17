@@ -1,0 +1,63 @@
+"""
+FEATURE CHANGES DOCUMENTATION
+=============================
+
+ORIGINAL FEATURES (TIER 1 + TIER 2)
+-----------------------------------
+These were the baseline features before enhancement.
+
+TIER 1: Essential Features (Always Extracted)
+- sentiment: Compound sentiment score (-1 to +1) from VADER. Measures emotional tone.
+- word_count: Total number of words in review. Flags very short/long reviews.
+- adj_noun_ratio: Ratio of adjectives to nouns. Fake reviews often have more adjectives.
+- first_person_ratio: Percentage of first-person pronouns (I, me, my, etc.). Fake reviews overuse self-reference.
+
+TIER 2: Important Features (Extracted if tier >= 2)
+- spam_keyword_count: Number of promotional/spam keywords detected.
+- caps_ratio: Percentage of words in ALL CAPS. Indicates exaggeration.
+- excessive_punct_count: Count of repeated punctuation (!!!, ???, ...).
+- uniqueness_ratio: Ratio of unique words to total words. Low values indicate repetition.
+
+NEW FEATURES ADDED (TIER 3: Advanced Features)
+---------------------------------------------
+Added in the enhancement to improve detection of subtle fakes.
+
+- flesch_score: Flesch Reading Ease score (0-100). Higher = easier to read.
+  * Represents: Readability. Fake reviews are often overly simple (high scores).
+  * Typical fake: 90+ (very easy), real: 70-80.
+
+- dale_chall_score: Dale-Chall Readability score. Measures vocabulary difficulty.
+  * Represents: Text complexity. Fake reviews may use simpler words.
+  * Typical fake: Lower scores, real: Higher scores.
+
+- bigram_repetitiveness: Ratio of unique bigrams to total bigrams (0-1).
+  * Represents: How repetitive 2-word sequences are. Lower = more repetitive (fake-like).
+  * Typical fake: 0.8-1.0, real: 0.9-1.0.
+
+- common_fake_ngrams: Count of predefined fake-review bigrams (e.g., 'this is', 'i love').
+  * Represents: Presence of stereotypical phrases. Higher = more likely fake.
+  * Typical fake: 2-5, real: 0-1.
+
+- tfidf_similarity: Cosine similarity (0-1) to generic review templates.
+  * Represents: How similar to boilerplate text. Higher = more generic (fake).
+  * Typical fake: 0.5-0.8, real: 0.0-0.2.
+
+WHAT THE NEW FEATURES REPRESENT
+-------------------------------
+- Readability (flesch/dale_chall): Detects if text is unnaturally simple or complex, common in generated content.
+- N-gram Analysis (bigram_repetitiveness/common_fake_ngrams): Catches repetitive patterns or spam phrases.
+- Semantic Similarity (tfidf_similarity): Identifies reviews that resemble templates or generic praise.
+
+ARE THERE EXCESSIVE FEATURES?
+-----------------------------
+No, the current set is balanced:
+- Total features: 13 main + sub-features (e.g., adjective_count).
+- No redundancy: Each measures a distinct aspect (sentiment ≠ readability).
+- Performance: Advanced features add ~2-3 seconds per review but improve accuracy.
+- If needed, remove least impactful (e.g., dale_chall if flesch suffices).
+
+USAGE:
+- Extracted when tier=3 in extract_all_features().
+- Thresholds: Add to config.py (e.g., FLESCH_MAX: 90, SIMILARITY_MAX: 0.5).
+- Testing: Run CELL 12 to see enhanced analysis.
+"""

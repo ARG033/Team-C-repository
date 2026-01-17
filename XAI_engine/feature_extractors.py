@@ -10,6 +10,10 @@ import re
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import textstat
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.util import ngrams
 
 # Download NLTK data (run once):
 import nltk
@@ -95,7 +99,6 @@ def extract_first_person_ratio(review_text):
 # ============================================================================
 # TIER 2: IMPORTANT FEATURES (SHOULD IMPLEMENT)
 # ============================================================================
-
 def detect_spam_keywords(review_text):
     """
     Detect spam/promotional keywords.
@@ -118,7 +121,6 @@ def detect_spam_keywords(review_text):
                 found.append({'keyword': keyword, 'category': category})
     
     return {'found': found, 'count': len(found)}
-
 
 def detect_excessive_caps(review_text):
     """
@@ -174,10 +176,67 @@ def calculate_text_redundancy(review_text):
 
 
 # ============================================================================
+# TIER 3: ADVANCED FEATURES (OPTIONAL ENHANCEMENT)
+# ============================================================================
+def extract_readability_score(review_text):
+    """
+    Calculate readability scores using textstat.
+    Fake reviews might be simpler (lower scores) or overly complex.
+    
+    Returns: {'flesch_score': float, 'dale_chall_score': float}
+    """
+    flesch = textstat.flesch_reading_ease(review_text)
+    dale_chall = textstat.dale_chall_readability_score(review_text)
+    return {'flesch_score': flesch, 'dale_chall_score': dale_chall}
+
+
+def extract_ngram_features(review_text, n=2):
+    """
+    Analyze n-grams for repetitive or spammy patterns.
+    Count common bigrams/trigrams in fake reviews.
+    
+    Returns: {'bigram_repetitiveness': float, 'common_fake_ngrams': int}
+    """
+    tokens = word_tokenize(review_text.lower())
+    bigrams = list(ngrams(tokens, n))
+    
+    # Define common fake n-grams (expand based on data analysis)
+    fake_ngrams = [('this', 'is'), ('i', 'love'), ('great', 'product'), ('best', 'ever')]
+    
+    common_count = sum(1 for bg in bigrams if bg in fake_ngrams)
+    repetitiveness = len(set(bigrams)) / len(bigrams) if bigrams else 0
+    
+    return {'bigram_repetitiveness': repetitiveness, 'common_fake_ngrams': common_count}
+
+
+def extract_semantic_similarity(review_text):
+    """
+    Use TF-IDF to measure similarity to generic review templates.
+    High similarity might indicate fake.
+    
+    Returns: {'tfidf_similarity': float}
+    """
+    # Simple TF-IDF similarity to a "generic" review
+    generic_reviews = [
+        "This product is amazing. I love it so much. Best purchase ever.",
+        "Great quality and fast shipping. Highly recommend.",
+        "Perfect for my needs. Will buy again."
+    ]
+    
+    vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(generic_reviews + [review_text])
+    
+    similarities = cosine_similarity(tfidf_matrix[-1:], tfidf_matrix[:-1])
+    max_sim = similarities.max()
+    
+    return {'tfidf_similarity': max_sim}
+
+
+# ============================================================================
 # MAIN FUNCTION: EXTRACT ALL FEATURES
 # ============================================================================
 
-def extract_all_features(review_text, tier=1):
+def extract_all_features(review_text, tier=3):
     """
     Extract all features based on tier level.
     
@@ -191,6 +250,7 @@ def extract_all_features(review_text, tier=1):
     features = {}
     
     # TIER 1: Always extract these
+    
     features['sentiment'] = extract_sentiment(review_text)
     features['word_count'] = extract_word_count(review_text)
     
@@ -204,18 +264,31 @@ def extract_all_features(review_text, tier=1):
     features['first_person_count'] = first_person['count']
     
     # TIER 2: Add if tier >= 2
-    if tier >= 2:
+    if tier >= 2:     
         spam = detect_spam_keywords(review_text)
-        features['spam_keywords_count'] = spam['count']
-        
+        features['spam_keyword_count'] = spam['count']  
+         
         caps = detect_excessive_caps(review_text)
         features['caps_ratio'] = caps['ratio']
         
         punct = detect_excessive_punctuation(review_text)
-        features['excessive_punctuation'] = punct['total']
+        features['excessive_punct_count'] = punct['total']
         
         redundancy = calculate_text_redundancy(review_text)
         features['uniqueness_ratio'] = redundancy['uniqueness_ratio']
+    
+    # TIER 3: Advanced features if tier >= 3
+    if tier >= 3:
+        readability = extract_readability_score(review_text)
+        features['flesch_score'] = readability['flesch_score']
+        features['dale_chall_score'] = readability['dale_chall_score']
+        
+        ngram_feat = extract_ngram_features(review_text)
+        features['bigram_repetitiveness'] = ngram_feat['bigram_repetitiveness']
+        features['common_fake_ngrams'] = ngram_feat['common_fake_ngrams']
+        
+        semantic = extract_semantic_similarity(review_text)
+        features['tfidf_similarity'] = semantic['tfidf_similarity']
     
     return features
         

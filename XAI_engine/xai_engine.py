@@ -11,16 +11,7 @@ OOP Concepts Used:
 """
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from .feature_extractors import (
-    extract_sentiment,
-    extract_word_count,
-    extract_adjective_noun_ratio,
-    extract_first_person_ratio,
-    detect_spam_keywords,
-    detect_excessive_caps,
-    detect_excessive_punctuation,
-    calculate_text_redundancy
-)
+from .feature_extractors import extract_all_features
 from .reason_generator import generate_explanation, format_explanation_text
 from .config import THRESHOLDS
 
@@ -96,48 +87,8 @@ class FakeReviewXAI:
         Returns:
             dict: Dictionary with all extracted features
         """
-        features = {}
-        
-        # ===== TIER 1: ESSENTIAL FEATURES =====
-        
-        # Feature 1: Sentiment Analysis
-        features['sentiment'] = extract_sentiment(review_text)
-        
-        # Feature 2: Word Count
-        features['word_count'] = extract_word_count(review_text)
-        
-        # Feature 3: Adjective-to-Noun Ratio
-        adj_noun_result = extract_adjective_noun_ratio(review_text)
-        features['adj_noun_ratio'] = adj_noun_result['ratio']
-        features['adjective_count'] = adj_noun_result['adjectives']
-        features['noun_count'] = adj_noun_result['nouns']
-        
-        # Feature 4: First-Person Pronoun Usage
-        first_person_result = extract_first_person_ratio(review_text)
-        features['first_person_ratio'] = first_person_result['ratio']
-        features['first_person_count'] = first_person_result['count']
-        
-        # ===== TIER 2: IMPORTANT FEATURES =====
-        
-        # Feature 5: Spam Keywords
-        spam_result = detect_spam_keywords(review_text)
-        features['spam_keyword_count'] = spam_result['count']
-        features['spam_keywords_found'] = spam_result['found']
-        
-        # Feature 6: Excessive Capitalization
-        caps_result = detect_excessive_caps(review_text)
-        features['caps_ratio'] = caps_result['ratio']
-        features['caps_count'] = caps_result['count']
-        
-        # Feature 7: Excessive Punctuation
-        punct_result = detect_excessive_punctuation(review_text)
-        features['excessive_punct_count'] = punct_result['total']
-        
-        # Feature 8: Text Redundancy
-        redundancy_result = calculate_text_redundancy(review_text)
-        features['uniqueness_ratio'] = redundancy_result['uniqueness_ratio']
-        
-        return features
+        # Use the enhanced extract_all_features with tier 3 (advanced features)
+        return extract_all_features(review_text, tier=3)
     
     def analyze_review(self, review_text):
         """
