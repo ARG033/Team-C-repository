@@ -138,6 +138,94 @@ def test_text_redundancy():
     assert result['uniqueness_ratio'] < 0.60, f"Expected uniqueness < 0.60, got {result['uniqueness_ratio']:.2%}"
     print(f" Text redundancy detected ({result['uniqueness_ratio']:.2%} unique)")
 
+# ============================================================================
+# TIER 3 FEATURE TESTS
+# ============================================================================
+
+def test_flesch_readability():
+    """Should detect overly simple readability (fake-like)"""
+    xai = FakeReviewXAI()
+    
+    # Simple fake-like text
+    simple = "Good product. I like it. It works well. Very nice."
+    result = xai.extract_all_features(simple)
+    
+    assert 'flesch_score' in result, "Missing flesch_score feature"
+    print(f"Flesch score extracted: {result['flesch_score']:.2f}")
+    
+    # More complex genuine-like text
+    complex_text = "The implementation demonstrates sophisticated engineering considerations."
+    result2 = xai.extract_all_features(complex_text)
+    
+    print(f"Complex text score: {result2['flesch_score']:.2f}")
+
+
+def test_dale_chall_score():
+    """Should detect simple vocabulary (fake-like)"""
+    xai = FakeReviewXAI()
+    result = xai.extract_all_features("Great product works good")
+    
+    assert 'dale_chall_score' in result, "Missing dale_chall_score feature"
+    print(f"Dale-Chall score extracted: {result['dale_chall_score']:.2f}")
+
+
+def test_bigram_repetitiveness():
+    """Should detect repetitive bigrams"""
+    xai = FakeReviewXAI()
+    
+    # Repetitive text
+    repetitive = "Great product great quality great price great value"
+    result = xai.extract_all_features(repetitive)
+    
+    assert 'bigram_repetitiveness' in result, "Missing bigram_repetitiveness feature"
+    print(f"Bigram repetitiveness extracted: {result['bigram_repetitiveness']:.2f}")
+
+
+def test_common_fake_ngrams():
+    """Should detect common fake review phrases"""
+    xai = FakeReviewXAI()
+    
+    # Text with common fake phrases
+    fake_phrases = "Best product ever! Highly recommend! Must have!"
+    result = xai.extract_all_features(fake_phrases)
+    
+    assert 'common_fake_ngrams' in result, "Missing common_fake_ngrams feature"
+    print(f"Common fake n-grams detected: {result['common_fake_ngrams']}")
+
+
+def test_tfidf_similarity():
+    """Should detect similarity to generic reviews"""
+    xai = FakeReviewXAI()
+    
+    # Generic fake-like review
+    generic = "Great product works well good quality"
+    result = xai.extract_all_features(generic)
+    
+    assert 'tfidf_similarity' in result, "Missing tfidf_similarity feature"
+    print(f"TF-IDF similarity extracted: {result['tfidf_similarity']:.2f}")
+
+
+def test_all_tiers_extracted():
+    """Should extract all features from all tiers"""
+    xai = FakeReviewXAI()
+    result = xai.extract_all_features("This is a test review with various words and patterns.")
+    
+    # Tier 1
+    tier1_features = ['sentiment', 'word_count', 'adj_noun_ratio', 'first_person_ratio']
+    
+    # Tier 2
+    tier2_features = ['spam_keyword_count', 'caps_ratio', 'excessive_punct_count', 'uniqueness_ratio']
+    
+    # Tier 3
+    tier3_features = ['flesch_score', 'dale_chall_score', 'bigram_repetitiveness', 
+                      'common_fake_ngrams', 'tfidf_similarity']
+    
+    all_features = tier1_features + tier2_features + tier3_features
+    
+    for feature in all_features:
+        assert feature in result, f"Missing feature: {feature}"
+    
+    print(f"All {len(all_features)} features extracted (Tier 1 + 2 + 3)")
 
 # ============================================================================
 # RUN ALL TESTS
@@ -163,7 +251,14 @@ if __name__ == "__main__":
         test_spam_keywords,
         test_excessive_caps,
         test_excessive_punctuation,
-        test_text_redundancy
+        test_text_redundancy,
+        # Tier 3
+        test_flesch_readability,
+        test_dale_chall_score,
+        test_bigram_repetitiveness,
+        test_common_fake_ngrams,
+        test_tfidf_similarity,
+        test_all_tiers_extracted
     ]
     
     passed = 0

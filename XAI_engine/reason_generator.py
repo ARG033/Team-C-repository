@@ -33,7 +33,7 @@ def generate_explanation(features, thresholds):
                 'message': f" Extremely negative sentiment (score: {sentiment:.2f}/1.0)",
                 'detail': "Genuine reviews typically show more balanced emotions"
             })
-        confidence_score += 25
+        confidence_score += 20
     
     # 2. Word Count Check
     word_count = features['word_count']
@@ -119,7 +119,7 @@ def generate_explanation(features, thresholds):
                 'message': f" Extremely readable text (Flesch: {features['flesch_score']:.1f})",
                 'detail': "Overly simple language, common in generated reviews"
             })
-            confidence_score += 10
+            confidence_score += 15
     
     # 10. N-gram Check
     if 'common_fake_ngrams' in features and features['common_fake_ngrams'] >= 2:
