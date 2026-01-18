@@ -17,6 +17,7 @@ THRESHOLDS = {
     'FIRST_PERSON_RATIO': 0.048,
     
     # TIER 2: Important Features
+    'SPAM_KEYWORD_MIN': 2,
     'CAPS_RATIO_MAX': 0.01,
     'EXCESSIVE_PUNCT_MIN': 1,
     'UNIQUENESS_RATIO_MIN': 0.79,

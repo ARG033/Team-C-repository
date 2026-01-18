@@ -7,4 +7,4 @@ name = "team-c-xai"
 version = "0.1.0"
 
 [tool.setuptools.packages.find]
-include = ["XAI_engine"]
+include = ["XAI_engine", "Integration"]
